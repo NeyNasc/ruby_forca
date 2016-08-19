@@ -1,23 +1,14 @@
-def da_boas_vindas
-	puts "Bem vindo ao jogo da forca!"
-	puts "Qual o seu nome?"
-	nome = gets.strip
-	puts "\n\n\n\n"
-	puts "Começaremos o jogo para você, #{nome}"
-	nome	
-end
-
-def sorteia_palavra_secreta
-	puts "Escolhendo uma palavra..."
-	palavra_secreta = "Programador"
-	puts "Escolhida uma palavra com #{palavra_secreta.size} letras... Boa sorte!"	
-	palavra_secreta
-end
-
-def nao_quer_jogar?
-	puts "Deseja jogar novamente? (S/N)"
-	quero_jogar = gets.strip
-	nao_quero_jogar = quero_jogar.upcase == "N"
+require_relative 'ui'
+def pede_um_chute_valido(chutes, erros)
+	cabecalho_de_tentativa chutes, erros
+	loop do
+		chute = pede_um_chute
+		if chutes.include? chute
+			avisa_chute_repetido chute				
+		else
+			return chute
+		end	
+	end
 end
 
 def joga(nome)
@@ -28,13 +19,7 @@ def joga(nome)
 	pontos_ate_agora = 0
 
 	while erros<5
-		chute = pede_um_chute chutes, erros
-		if chutes.include? chute
-			puts "Você já chutou #{chute}"
-			next
-		end
-
-
+		chute = pede_um_chute_valido chutes, erros
 		chutes << chute
 
 		chutou_uma_unica_letra = chute.size==1
@@ -43,46 +28,31 @@ def joga(nome)
 			total_encontrado = palavra_secreta.count(chute[0])
 			
 			if total_encontrado==0
-				puts "Letra não encontrada!"
+				avisa_letra_nao_encontrada
 				erros += 1
 			else
-				puts "Letra encontrada #{total_encontrado} vezes!"
+				avisa_letra_encontrada total_encontrado
 			end
 		
 		else
 			acertou = chute == palavra_secreta
 			if acertou
-				puts "Parabéns! Acertou!"
+				avisa_acertou_palavra
 				pontos_ate_agora+=100
 				break				
 			else
-				puts "Que pena.. errou!"
+				avisa_errou_palavra
 				pontos_ate_agora-=30
 				erros+=1
 			end
 		end
+	end	
+end
+
+def jogo_da_forca
+	nome = da_boas_vindas
+	loop do 
+		joga nome
+		break if nao_quer_jogar?
 	end
-
-	puts "Você ganhou #{pontos_ate_agora} pontos."
-	
-end
-
-def pede_um_chute(chutes, erros)
-	puts "\n\n\n\n"
-	puts "Erros até agora: #{erros}"
-	puts "Chutes até agora: #{chutes}"
-	puts "Entre com a letra ou palavra"
-	chute = gets.strip
-	puts "Será que acertou? Você chutou #{chute}"
-	chute	
-end
-
-
-
-#Principal
-nome = da_boas_vindas
-
-loop do 
-	joga nome
-	break if nao_quer_jogar?
 end
